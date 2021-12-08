@@ -115,4 +115,7 @@ _Note:_ if you need more info feel free to read [Expo Docs](https://docs.expo.de
 ### DONE
 
 - Make this module an npm package just for fun, and educative purposes.
+- Added more functions for flexibility
 - Added more documentation.
+- Added changelog.
+- Added tags.

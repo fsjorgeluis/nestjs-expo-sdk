@@ -33,9 +33,4 @@ export class ExpoSdkCoreModule {
       exports: [services],
     };
   }
-
-  private static async callTheFunction(options: any) {
-    const result = await options.useFactory(options.inject[0]);
-    return result;
-  }
 }
