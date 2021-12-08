@@ -1,6 +1,6 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ExpoClientOptions } from 'expo-server-sdk';
-import { IExpoClientAsyncOptions } from 'src';
+import { IExpoClientAsyncOptions } from './interfaces';
 import { createServices, createAsyncServices } from './services';
 
 @Global()

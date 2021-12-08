@@ -1,6 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ExpoClientOptions } from 'expo-server-sdk';
-import { IExpoClientAsyncOptions } from 'src';
+import { IExpoClientAsyncOptions } from './interfaces';
 import { ExpoSdkCoreModule } from './expo-sdk-core.module';
 
 @Module({})
