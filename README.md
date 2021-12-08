@@ -41,6 +41,18 @@ imports: [
 ],
 ```
 
+`ExpoSdkModule` also includes `forRootAsync` method to pass args asynchronously
+
+```
+ExpoSdkModule.forRootAsync({
+  imports: [ConfigModule],
+  useFactory: (configService: ConfigService) => ({
+    accessToken: configService.get<string>('SOME_ENV_VAR'),
+  }),
+  inject: [ConfigService],
+}),
+```
+
 now it's time to use it in your provider
 
 ```

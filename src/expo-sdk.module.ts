@@ -1,5 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ExpoClientOptions } from 'expo-server-sdk';
+import { IExpoClientAsyncOptions } from 'src';
 import { ExpoSdkCoreModule } from './expo-sdk-core.module';
 
 @Module({})
@@ -11,6 +12,13 @@ export class ExpoSdkModule {
     return {
       module: ExpoSdkModule,
       imports: [ExpoSdkCoreModule.forRoot(options, isGlobal)],
+    };
+  }
+
+  public static forRootAsync(options: IExpoClientAsyncOptions): DynamicModule {
+    return {
+      module: ExpoSdkModule,
+      imports: [ExpoSdkCoreModule.forRootAsync(options)],
     };
   }
 }
