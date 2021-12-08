@@ -1,73 +1,106 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
+    <img src="https://user-images.githubusercontent.com/20530235/145147022-769c8020-a92b-4e63-b964-f8fc3aebb09e.png">
+</p>
+<p align="center">
+    <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/fsjorgeluis/nestjs-expo-sdk">
+    <img alt="npm bundle size" src="https://img.shields.io/bundlephobia/minzip/nestjs-expo-sdk">
+    <img alt="GitHub package.json dependency version (dev dep on branch)" src="https://img.shields.io/github/package-json/dependency-version/fsjorgeluis/nestjs-expo-sdk/dev/typescript">
+    <img alt="GitHub package.json dependency version (dev dep on branch)" src="https://img.shields.io/github/package-json/dependency-version/fsjorgeluis/nestjs-expo-sdk/dev/jest">
+    <img alt="GitHub" src="https://img.shields.io/github/license/fsjorgeluis/nestjs-expo-sdk">
+    <a href="https://twitter.com/intent/follow?screen_name=fsjorgeluis">
+        <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/fsjorgeluis?logo=twitter&logoColor=blue&style=social">
+    </a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# NestJs + Expo push notifications
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A little module to make push notifications with react native in nestjs a bit easier work, hand by hand with `expo-server-sdk`.
 
-## Description
+Feel free to use it, if you like it! :D
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Ready to use
 
-## Installation
+Just `npm install nestjs-expo-sdk` this package use `expo-server-sdk` under the hood, then
 
-```bash
-$ npm install
+```
+import { ExpoSdkModule } from 'nestjs-expo-sdk';
+
+@Module()
+imports: [
+  // Create a new Expo SDK client
+  // optionally providing an access token if you have
+  enabled push security
+  // second optional arg boolean to define if
+  // this module is global or not. True by default
+  ExpoSdkModule.forRoot(
+    {
+      accessToken: process.env.EXPO_ACCESS_TOKEN,
+    },
+    true,
+  ),
+],
 ```
 
-## Running the app
+now it's time to use it in your provider
 
-```bash
-# development
-$ npm run start
+```
+@Injectable()
+export class AppService {
+  // You can inject expo now and use as any or
+  // Expo if you have previously installed expo-server-sdk
+  // just to get types, declarations or another functions :D
+  constructor(@InjectExpo() private expo: any) {}
 
-# watch mode
-$ npm run start:dev
+  async sendPush(somePushTokens): Promise<any> {
+    let messages = [];
+    for (let pushToken of somePushTokens) {
+      // Each push token looks like ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]
 
-# production mode
-$ npm run start:prod
+      // Check that all your push tokens appear to be valid Expo push tokens
+      if (!Expo.isExpoPushToken(pushToken)) {
+        console.error(`Push token ${pushToken} is not a valid Expo push token`);
+        continue;
+      }
+
+      // Construct a message
+      messages.push({
+        to: pushToken,
+        sound: 'default',
+        body: 'This is a test notification',
+        data: { withSome: 'data' },
+      });
+    }
+
+    let chunks = this.expo.chunkPushNotifications(messages);
+    let tickets = [];
+
+    for (let chunk of chunks) {
+      try {
+        let ticketChunk = await this.expo.sendPushNotificationsAsync(messages);
+        console.log(ticketChunk);
+        console.log(ticketChunk);
+        tickets.push(...ticketChunk);
+        // NOTE: If a ticket contains an error code in ticket.details.error, you
+        // must handle it appropriately. The error codes are listed in the Expo
+        // documentation
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+}
 ```
 
-## Test
+and you are ready to go.
 
-```bash
-# unit tests
-$ npm run test
+_Note:_ if you need more info feel free to read [Expo Docs](https://docs.expo.dev/push-notifications/sending-notifications/)
 
-# e2e tests
-$ npm run test:e2e
+### TODO
 
-# test coverage
-$ npm run test:cov
-```
+- Add maybe more fuctionality.
+- Add test
 
-## Support
+### DONE
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+- Make this module an npm package just for fun, and educative purposes.
+- Added more documentation.
