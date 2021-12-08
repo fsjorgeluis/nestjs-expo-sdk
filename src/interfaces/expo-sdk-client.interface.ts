@@ -1,6 +1,6 @@
 import { ModuleMetadata, Type } from '@nestjs/common';
 import Expo, { ExpoClientOptions } from 'expo-server-sdk';
-import { IExpoClientFactory } from './expo-sdk-options-factory.interface';
+import { IExpoClientFactory } from './';
 
 // eslint-disable-next-line
 export interface IExpoSdkClient extends Expo {}

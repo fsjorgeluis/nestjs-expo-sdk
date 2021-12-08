@@ -1,8 +1,8 @@
 import { Provider } from '@nestjs/common';
 import { ExpoClientOptions } from 'expo-server-sdk';
-import { IExpoClientAsyncOptions } from 'src';
-import { EXPO_NOTIFICATIONS_OPTIONS } from 'src/constants';
-import { createClient, createAsyncClient } from 'src/helpers';
+import { IExpoClientAsyncOptions } from '../interfaces';
+import { EXPO_NOTIFICATIONS_OPTIONS } from '../constants';
+import { createClient, createAsyncClient } from '../helpers';
 
 export function createServices(options?: ExpoClientOptions): Provider {
   return {
